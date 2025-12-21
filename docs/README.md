@@ -5,7 +5,7 @@ python3 src/server.py
 localhost:8888
 
 ## Example Usage
-curl -x localhost:8888 http://example.com
+curl http://example.com -x localhost:8888 
 
 ## Design Doc
 read the deign doc in docs folder....
