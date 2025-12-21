@@ -1,0 +1,2 @@
+2025-12-21 07:00:28 | 127.0.0.1:54491 | blockedsite2.org:80 | GET http://blockedsite2.org/ HTTP/1.1 | BLOCKED | 403 | 0 bytes
+2025-12-21 07:00:47 | 127.0.0.1:54567 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 822 bytes

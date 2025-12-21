@@ -3,7 +3,7 @@ import threading
 import os
 HOST = "127.0.0.1"
 PORT = 8888
-
+#PARSER FUNCTION
 def parse_http_request(request_bytes):
     text = request_bytes.decode(errors="ignore")
     lines = text.split("\r\n")
@@ -39,7 +39,7 @@ def parse_http_request(request_bytes):
                 break
 
     return method, host, port, path
-
+#LOAD BLOCKLIST
 blocked_domains=set()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BLOCKLIST_PATH = os.path.join(BASE_DIR, "config", "blocked_domains.txt")
@@ -54,17 +54,43 @@ except FileNotFoundError:
         print(" blocked_domains.txt not found")
 
 
+import datetime
 
-print(blocked_domains)
+LOG_FILE = "logs/proxy.log"
+
+def log_request(
+    client_addr,
+    request_line,
+    host,
+    port,
+    action,
+    status,
+    size
+):
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    log_line = (
+        f"{timestamp} | "
+        f"{client_addr[0]}:{client_addr[1]} | "
+        f"{host}:{port} | "
+        f"{request_line} | "
+        f"{action} | "
+        f"{status} | "
+        f"{size} bytes\n"
+    )
+
+    with open(LOG_FILE, "a") as f:
+        f.write(log_line)
 
 
 
-
+#HANDLE CLIENT (THREAD)
 def handle_client(client_socket, client_address):
     print(f"[+] Handling {client_address}")
 
     try:
         data = client_socket.recv(4096)
+        request_line=data.decode(errors="ignore").split("\r\n")[0]
         method, host, port, path = parse_http_request(data)
 
         if host.lower() in blocked_domains:
@@ -77,6 +103,15 @@ def handle_client(client_socket, client_address):
              "\r\n"
              "403 Forbidden"
              )
+            log_request(
+                client_address,
+                request_line,
+                host,
+                port,
+                "BLOCKED",
+                403,
+                0
+            )
 
             client_socket.sendall(response.encode())
             return
@@ -88,6 +123,8 @@ def handle_client(client_socket, client_address):
         
         print("Forwardinfg to: ", host,port)
 
+
+
         remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         remote_socket.connect((host,port))
         forward_request=(
@@ -98,12 +135,32 @@ def handle_client(client_socket, client_address):
         )
 
         remote_socket.sendall(forward_request.encode())
+        total_bytes = 0
+        status_code = 200  # default
+
 
         while True:
             response = remote_socket.recv(4096)
             if not response:
                 break
+
+            total_bytes += len(response)
+            if total_bytes == 0:
+             try:
+                status_code = int(response.split(b" ")[1])
+             except:
+              status_code = 0
             client_socket.sendall(response)
+
+        log_request(
+                client_address,
+                request_line,
+                host,
+                port,
+                "ALLOWED",
+                status_code,
+                total_bytes
+            )        
 
 
     except Exception as e:
