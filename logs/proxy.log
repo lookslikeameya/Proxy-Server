@@ -1,2 +1,9 @@
 2025-12-21 07:00:28 | 127.0.0.1:54491 | blockedsite2.org:80 | GET http://blockedsite2.org/ HTTP/1.1 | BLOCKED | 403 | 0 bytes
 2025-12-21 07:00:47 | 127.0.0.1:54567 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 822 bytes
+2025-12-21 07:28:13 | 127.0.0.1:61290 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 822 bytes
+2025-12-21 07:29:08 | 127.0.0.1:61523 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 827 bytes
+2025-12-21 08:04:27 | 127.0.0.1:53786 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 0 bytes
+2025-12-21 08:05:08 | 127.0.0.1:53960 | blockedsite2.org:80 | GET http://blockedsite2.org/ HTTP/1.1 | BLOCKED | 403 | 0 bytes
+2025-12-21 08:06:18 | 127.0.0.1:54220 | neverssl.com:80 | GET http://neverssl.com/ HTTP/1.1 | ALLOWED | 200 | 0 bytes
+2025-12-21 08:08:52 | 127.0.0.1:54875 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 0 bytes
+2025-12-21 08:08:55 | 127.0.0.1:54886 | blockedsite2.org:80 | GET http://blockedsite2.org/ HTTP/1.1 | BLOCKED | 403 | 0 bytes

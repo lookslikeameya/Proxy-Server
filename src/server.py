@@ -89,7 +89,13 @@ def handle_client(client_socket, client_address):
     print(f"[+] Handling {client_address}")
 
     try:
-        data = client_socket.recv(4096)
+        data = b""
+        while b"\r\n\r\n" not in data:
+          chunk = client_socket.recv(4096)
+          if not chunk:
+             break
+          data += chunk
+
         request_line=data.decode(errors="ignore").split("\r\n")[0]
         method, host, port, path = parse_http_request(data)
 
@@ -140,7 +146,14 @@ def handle_client(client_socket, client_address):
 
 
         while True:
-            response = remote_socket.recv(4096)
+           
+            response = b""
+            while b"\r\n\r\n" not in data:
+                chunk = client_socket.recv(4096)
+                if not chunk:
+                 break
+                data += chunk
+
             if not response:
                 break
 
@@ -167,6 +180,8 @@ def handle_client(client_socket, client_address):
         print(f"[!] Error with {client_address}: {e}")
 
     finally:
+        if 'remote_socket' in locals():
+         remote_socket.close()
         client_socket.close()
         print(f"[-] Closed {client_address}\n")
 

@@ -1,0 +1,84 @@
+========================================
+Custom Network Proxy Server – Test Cases
+========================================
+
+Proxy Address:
+localhost:8888
+
+----------------------------------------
+Test 1: Successful HTTP Request Forwarding
+----------------------------------------
+
+Command:
+curl -x localhost:8888 http://example.com
+
+Expected Result:
+- HTML content of example.com is returned
+- Proxy forwards request to destination server
+- Log entry marked as ALLOWED
+
+----------------------------------------
+Test 2: Blocking Blacklisted Domain
+----------------------------------------
+
+Setup:
+Add the following entry to config/blocked_domains.txt:
+example.com
+
+Command:
+curl -x localhost:8888 http://example.com
+
+Expected Result:
+- HTTP/1.1 403 Forbidden response
+- Request is not forwarded
+- Log entry marked as BLOCKED
+
+----------------------------------------
+Test 3: Concurrent Client Handling
+----------------------------------------
+
+Command:
+curl -x localhost:8888 http://example.com &
+curl -x localhost:8888 http://neverssl.com &
+curl -x localhost:8888 http://example.org &
+
+Expected Result:
+- All requests handled concurrently
+- No blocking or crashes
+- Separate log entries for each request
+
+----------------------------------------
+Test 4: Malformed Request Handling
+----------------------------------------
+
+Command:
+nc localhost 8888
+
+Input:
+HELLO
+
+Expected Result:
+- Proxy does not crash
+- Connection is closed gracefully
+- Error handled safely
+
+----------------------------------------
+Test 5: Logging Verification
+----------------------------------------
+
+Command:
+cat logs/proxy.log
+
+Expected Result:
+Each log entry contains:
+- Timestamp
+- Client IP and port
+- Requested host and port
+- Request line
+- Action (ALLOWED or BLOCKED)
+- HTTP status code
+- Bytes transferred
+
+----------------------------------------
+End of Test Cases
+----------------------------------------
