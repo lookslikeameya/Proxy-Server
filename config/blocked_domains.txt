@@ -1,0 +1,2 @@
+blockedsite1.com
+blockedsite2.org

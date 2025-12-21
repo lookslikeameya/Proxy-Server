@@ -1,6 +1,6 @@
 import socket
 import threading
-
+import os
 HOST = "127.0.0.1"
 PORT = 8888
 
@@ -40,6 +40,25 @@ def parse_http_request(request_bytes):
 
     return method, host, port, path
 
+blocked_domains=set()
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BLOCKLIST_PATH = os.path.join(BASE_DIR, "config", "blocked_domains.txt")
+
+try:
+    with open(BLOCKLIST_PATH) as f:
+        for line in f:
+            line=line.strip().lower()
+            if line and not line.startswith("#"):
+                    blocked_domains.add(line)
+except FileNotFoundError:
+        print(" blocked_domains.txt not found")
+
+
+
+print(blocked_domains)
+
+
+
 
 def handle_client(client_socket, client_address):
     print(f"[+] Handling {client_address}")
@@ -48,21 +67,29 @@ def handle_client(client_socket, client_address):
         data = client_socket.recv(4096)
         method, host, port, path = parse_http_request(data)
 
+        if host.lower() in blocked_domains:
+            print(f"BLOCKED: {host}")
+
+            response = (
+             "HTTP/1.1 403 Forbidden\r\n"
+             "Content-Length: 13\r\n"
+             "Connection: close\r\n"
+             "\r\n"
+             "403 Forbidden"
+             )
+
+            client_socket.sendall(response.encode())
+            return
+
+
        
         
 
-        print("----- RAW DATA START -----")
-        print("METHOD:", method)
-        print("HOST  :", host)
-        print("PORT  :", port)
-        print("PATH  :", path)
-
-        print("----- RAW DATA END -----")
-
+        
         print("Forwardinfg to: ", host,port)
 
         remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        remote_socket.connect(host,port)
+        remote_socket.connect((host,port))
         forward_request=(
             f"{method} {path} HTTP/1.1\r\n"
             f"Host: {host}\r\n"
