@@ -8,7 +8,7 @@ def parse_http_request(request_bytes):
     text = request_bytes.decode(errors="ignore")
     lines = text.split("\r\n")
 
-    # Request line
+    
     request_line = lines[0]
     method, target, version = request_line.split()
 
@@ -16,7 +16,7 @@ def parse_http_request(request_bytes):
     port = 80
     path = "/"
 
-    # Case 1: Absolute URL (proxy style)
+    # if Absolute URL 
     if target.startswith("http://"):
         without_http = target[len("http://"):]
         parts = without_http.split("/", 1)
@@ -30,7 +30,7 @@ def parse_http_request(request_bytes):
         else:
             host = host_port
 
-    # Case 2: Relative path + Host header
+    # if Relative path + Host header
     else:
         path = target
         for line in lines:
@@ -59,17 +59,25 @@ def handle_client(client_socket, client_address):
 
         print("----- RAW DATA END -----")
 
-        body = "Hello from proxy server!\n"
-        response = (
-            "HTTP/1.1 200 OK\r\n"
-            f"Content-Length: {len(body)}\r\n"
-            "Content-Type: text/plain\r\n"
+        print("Forwardinfg to: ", host,port)
+
+        remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        remote_socket.connect(host,port)
+        forward_request=(
+            f"{method} {path} HTTP/1.1\r\n"
+            f"Host: {host}\r\n"
             "Connection: close\r\n"
             "\r\n"
-            f"{body}"
         )
 
-        client_socket.sendall(response.encode())
+        remote_socket.sendall(forward_request.encode())
+
+        while True:
+            response = remote_socket.recv(4096)
+            if not response:
+                break
+            client_socket.sendall(response)
+
 
     except Exception as e:
         print(f"[!] Error with {client_address}: {e}")
