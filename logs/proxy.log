@@ -7,3 +7,4 @@
 2025-12-21 08:06:18 | 127.0.0.1:54220 | neverssl.com:80 | GET http://neverssl.com/ HTTP/1.1 | ALLOWED | 200 | 0 bytes
 2025-12-21 08:08:52 | 127.0.0.1:54875 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 0 bytes
 2025-12-21 08:08:55 | 127.0.0.1:54886 | blockedsite2.org:80 | GET http://blockedsite2.org/ HTTP/1.1 | BLOCKED | 403 | 0 bytes
+2025-12-21 19:15:12 | 127.0.0.1:52360 | example.com:80 | GET http://example.com/ HTTP/1.1 | ALLOWED | 200 | 0 bytes
